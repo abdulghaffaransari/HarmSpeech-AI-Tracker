@@ -75,7 +75,7 @@ Access the API docs at: `http://127.0.0.1:8000/docs`
 ## **Current Progress**  
 - ✅ Project structure initialized.  
 - ✅ Dependencies installed.  
-- ✅ Data pipeline modules implemented.  
+- ✅ Data pipeline modules are in progress.  
 - 🔄 Model training in progress.  
 - ⏳ API and deployment integration (coming soon).  
 
