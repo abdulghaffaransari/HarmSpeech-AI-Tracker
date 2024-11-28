@@ -39,8 +39,8 @@ X_TRAIN_FILE_NAME = 'x_train.csv'
 
 RANDOM_STATE = 42
 EPOCH = 1
-BATCH_SIZE = 128
-VALIDATION_SPLIT = 0.2
+BATCH_SIZE = 1024
+VALIDATION_SPLIT = 0.6
 
 
 # Model Architecture constants

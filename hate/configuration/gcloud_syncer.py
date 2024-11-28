@@ -5,23 +5,31 @@ import subprocess
 class GCloudSync:
 
     def sync_folder_to_gcloud(self, gcp_bucket_url, filepath, filename):
-        # Ensure filepath ends with a slash for clarity
-        if not filepath.endswith("/"):
-            filepath += "/"
+        try:
+            # Ensure filepath ends correctly
+            filepath = os.path.join(filepath, filename)
 
-        # Construct the command
-        command = f'gsutil cp "{filepath}{filename}" gs://{gcp_bucket_url}/'
-        logging.info(f"Executing command: {command}")
-        
-        # Use subprocess for better error handling and logging
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+            # Ensure the file exists
+            if not os.path.isfile(filepath):
+                raise FileNotFoundError(f"File not found: {filepath}")
 
-        # Log the result
-        if result.returncode == 0:
-            logging.info(f"Successfully uploaded {filename} to gs://{gcp_bucket_url}/")
-        else:
-            logging.error(f"Failed to upload {filename} to gs://{gcp_bucket_url}/: {result.stderr}")
-            raise Exception(f"gsutil cp failed: {result.stderr}")
+            # Construct the command
+            command = f'gsutil cp "{filepath}" gs://{gcp_bucket_url}/'
+            logging.info(f"Executing command: {command}")
+
+            # Use subprocess for better error handling and logging
+            result = subprocess.run(command, shell=True, capture_output=True, text=True)
+
+            # Log the result
+            if result.returncode == 0:
+                logging.info(f"Successfully uploaded {filename} to gs://{gcp_bucket_url}/")
+            else:
+                logging.error(f"Failed to upload {filename} to gs://{gcp_bucket_url}/. Command: {command} Output: {result.stdout} Error: {result.stderr}")
+                raise Exception(f"gsutil cp failed: {result.stderr}")
+
+        except Exception as e:
+            logging.error(f"Exception occurred during sync: {str(e)}")
+            raise
 
     def sync_folder_from_gcloud(self, gcp_bucket_url, filename, destination):
         # Ensure the destination ends with a trailing slash
