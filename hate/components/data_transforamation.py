@@ -41,7 +41,8 @@ class DataTransformation:
                 axis=self.data_transformation_config.AXIS,
                 inplace=self.data_transformation_config.INPLACE
             )
-            raw_data[self.data_transformation_config.CLASS].replace({0: 1, 2: 0}, inplace=True)
+            # Avoid chained assignment by explicitly assigning back to the column
+            raw_data[self.data_transformation_config.CLASS] = raw_data[self.data_transformation_config.CLASS].replace({0: 1, 2: 0})
             raw_data.rename(
                 columns={self.data_transformation_config.CLASS: self.data_transformation_config.LABEL},
                 inplace=True
@@ -50,6 +51,7 @@ class DataTransformation:
             return raw_data
         except Exception as e:
             raise CustomException(e, sys) from e
+
 
     def concat_dataframe(self):
         try:

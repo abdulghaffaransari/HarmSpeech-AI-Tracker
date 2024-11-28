@@ -1,0 +1,53 @@
+version: 2.1
+
+executors:
+  docker-executor:
+    docker:
+      - image: circleci/python:3.10
+
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.10
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.7
+      - run:
+          name: Install dependencies
+          command: |
+            python -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+      - run:
+          name: Run tests
+          command: |
+            . venv/bin/activate
+            pytest
+
+  docker_build:
+    docker:
+      - image: circleci/python:3.10
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.7
+      - run:
+          name: Build Docker Image
+          command: docker build -t harmspeech-ai-tracker .
+      - run:
+          name: Authenticate with Docker Hub
+          command: |
+            echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
+      - run:
+          name: Push Docker Image
+          command: docker tag harmspeech-ai-tracker $DOCKERHUB_USER/harmspeech-ai-tracker:latest && docker push $DOCKERHUB_USER/harmspeech-ai-tracker:latest
+
+workflows:
+  version: 2
+  test-deploy:
+    jobs:
+      - build
+      - docker_build:
+          requires:
+            - build
