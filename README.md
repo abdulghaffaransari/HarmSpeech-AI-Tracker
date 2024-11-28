@@ -21,7 +21,7 @@ The system employs scalable cloud solutions, **CI/CD pipelines**, and automated 
     - Saves the **best-performing model** back to the GCP bucket for production use.  
 - **Test-Driven Development**: Comprehensive unit tests for every module to ensure reliability and quality.  
 - **CI/CD Pipelines**: Seamless integration with **CircleCI** for automated testing, building, and deployment.  
-- **AWS Deployment**: Transitioned from GCP to **AWS EC2** and **S3**, ensuring scalable and robust production deployment.  
+- **AWS Deployment**: Transitioned from GCP to **AWS EC2** and **Amazon ECR**, ensuring scalable and robust production deployment.  
 - **Real-Time API**: FastAPI-based endpoints for quick and accurate predictions.  
 - **Data Pipeline Automation**: Fully automated data ingestion, transformation, and preprocessing workflows.  
 - **Scalable Architecture**: Dockerized components with modular design for ease of deployment and maintenance.  
