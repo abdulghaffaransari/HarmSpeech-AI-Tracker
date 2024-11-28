@@ -1,53 +1,53 @@
 version: 2.1
-
-executors:
-  docker-executor:
-    docker:
-      - image: circleci/python:3.10
-
+orbs:
+  aws-ecr: circleci/aws-ecr@8.2.1
+  aws-cli: circleci/aws-cli@3.1.4
 jobs:
-  build:
+  continuous-integration:
     docker:
-      - image: circleci/python:3.10
+      - image: cimg/base:stable
+    resource_class: medium
     steps:
-      - checkout
       - setup_remote_docker:
-          version: 20.10.7
-      - run:
-          name: Install dependencies
-          command: |
-            python -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
-      - run:
-          name: Run tests
-          command: |
-            . venv/bin/activate
-            pytest
+          version: 20.10.14
+          docker_layer_caching: true
 
-  docker_build:
-    docker:
-      - image: circleci/python:3.10
+      - aws-ecr/build-and-push-image:
+          create-repo: true
+          dockerfile: Dockerfile
+          path: .
+          platform: linux/amd64
+          push-image: true
+          region: '${AWS_REGION}'
+          repo: demo
+          registry-id: AWS_ECR_REGISTRY_ID
+          repo-scan-on-push: true
+          tag: latest
+
+  continuous-delivery:
+    machine: true
+    resource_class: agansari/haterunner
     steps:
-      - checkout
-      - setup_remote_docker:
-          version: 20.10.7
-      - run:
-          name: Build Docker Image
-          command: docker build -t harmspeech-ai-tracker .
-      - run:
-          name: Authenticate with Docker Hub
-          command: |
-            echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
-      - run:
-          name: Push Docker Image
-          command: docker tag harmspeech-ai-tracker $DOCKERHUB_USER/harmspeech-ai-tracker:latest && docker push $DOCKERHUB_USER/harmspeech-ai-tracker:latest
+      - aws-cli/setup
 
+      - run:
+          name: auth to aws ecr
+          command: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 136566696263.dkr.ecr.us-east-1.amazonaws.com
+          
+          
+
+      - run:
+          name: pull image from private repository
+          command: docker pull 136566696263.dkr.ecr.us-east-1.amazonaws.com/demo:latest
+          
+      
+      - run:
+          name: run image
+          command: docker run -d -p 8080:8080 136566696263.dkr.ecr.us-east-1.amazonaws.com/demo:latest
 workflows:
-  version: 2
-  test-deploy:
+  CICD:
     jobs:
-      - build
-      - docker_build:
+      - continuous-integration
+      - continuous-delivery:
           requires:
-            - build
+          - continuous-integration
