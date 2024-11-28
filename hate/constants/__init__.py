@@ -38,13 +38,13 @@ Y_TEST_FILE_NAME = 'y_test.csv'
 X_TRAIN_FILE_NAME = 'x_train.csv'
 
 RANDOM_STATE = 42
-EPOCH = 1
-BATCH_SIZE = 1024
-VALIDATION_SPLIT = 0.6
+EPOCH = 5
+BATCH_SIZE = 32
+VALIDATION_SPLIT = 0.2
 
 
 # Model Architecture constants
-MAX_WORDS = 20000
+MAX_WORDS = 15000
 MAX_LEN = 100
 LOSS = 'binary_crossentropy'
 METRICS = ['accuracy']
